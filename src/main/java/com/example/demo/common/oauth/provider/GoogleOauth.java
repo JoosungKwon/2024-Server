@@ -1,7 +1,7 @@
-package com.example.demo.common.oauth;
+package com.example.demo.common.oauth.provider;
 
-import com.example.demo.src.user.model.GoogleOAuthToken;
-import com.example.demo.src.user.model.GoogleUser;
+import com.example.demo.common.oauth.model.OAuthToken;
+import com.example.demo.common.oauth.model.SocialOauth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
+@Component("GOOGLE")
 @RequiredArgsConstructor
 public class GoogleOauth implements SocialOauth {
 
@@ -65,7 +65,6 @@ public class GoogleOauth implements SocialOauth {
          * */
     }
 
-
     public ResponseEntity<String> requestAccessToken(String code) {
         String GOOGLE_TOKEN_REQUEST_URL = "https://oauth2.googleapis.com/token";
         RestTemplate restTemplate = new RestTemplate();
@@ -76,41 +75,36 @@ public class GoogleOauth implements SocialOauth {
         params.put("redirect_uri", GOOGLE_SNS_CALLBACK_LOGIN_URL);
         params.put("grant_type", "authorization_code");
 
-        ResponseEntity<String> responseEntity=restTemplate.postForEntity(GOOGLE_TOKEN_REQUEST_URL,
-                params,String.class);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(GOOGLE_TOKEN_REQUEST_URL,
+                params, String.class);
 
-        if(responseEntity.getStatusCode() == HttpStatus.OK){
+        if (responseEntity.getStatusCode() == HttpStatus.OK) {
             return responseEntity;
         }
         return null;
     }
 
-    public GoogleOAuthToken getAccessToken(ResponseEntity<String> response) throws JsonProcessingException {
+    public OAuthToken getAccessToken(ResponseEntity<String> response) throws JsonProcessingException {
         log.info("response.getBody() = {}", response.getBody());
 
-        GoogleOAuthToken googleOAuthToken= objectMapper.readValue(response.getBody(),GoogleOAuthToken.class);
+        OAuthToken googleOAuthToken = objectMapper.readValue(response.getBody(), OAuthToken.class);
         return googleOAuthToken;
 
     }
 
-    public ResponseEntity<String> requestUserInfo(GoogleOAuthToken oAuthToken) {
-        String GOOGLE_USERINFO_REQUEST_URL="https://www.googleapis.com/oauth2/v1/userinfo";
+    public ResponseEntity<String> requestUserInfo(OAuthToken oAuthToken) {
+        String GOOGLE_USERINFO_REQUEST_URL = "https://www.googleapis.com/oauth2/v1/userinfo";
 
         //header에 accessToken을 담는다.
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization","Bearer "+oAuthToken.getAccess_token());
+        headers.add("Authorization", "Bearer " + oAuthToken.getAccessToken());
 
         //HttpEntity를 하나 생성해 헤더를 담아서 restTemplate으로 구글과 통신하게 된다.
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity(headers);
-        ResponseEntity<String> response = restTemplate.exchange(GOOGLE_USERINFO_REQUEST_URL, HttpMethod.GET,request,String.class);
+        ResponseEntity<String> response = restTemplate.exchange(GOOGLE_USERINFO_REQUEST_URL, HttpMethod.GET, request, String.class);
 
         log.info("response.getBody() = {}", response.getBody());
 
         return response;
-    }
-
-    public GoogleUser getUserInfo(ResponseEntity<String> userInfoRes) throws JsonProcessingException{
-        GoogleUser googleUser = objectMapper.readValue(userInfoRes.getBody(),GoogleUser.class);
-        return googleUser;
     }
 }

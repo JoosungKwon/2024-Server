@@ -1,8 +1,6 @@
-package com.example.demo.src.user;
+package com.example.demo.src.user.repository;
 
 
-
-import com.example.demo.common.entity.BaseEntity.State;
 import com.example.demo.common.exceptions.BaseException;
 import com.example.demo.src.user.entity.User;
 import com.example.demo.src.user.model.*;
@@ -17,12 +15,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.demo.common.entity.BaseEntity.State.ACTIVE;
-import static com.example.demo.common.response.BaseResponseStatus.*;
+import static com.example.demo.common.model.response.BaseResponseStatus.*;
 
 // Service Create, Update, Delete 의 로직 처리
-@Transactional
-@RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
@@ -33,13 +31,13 @@ public class UserService {
     public PostUserRes createUser(PostUserReq postUserReq) {
         //중복 체크
         Optional<User> checkUser = userRepository.findByEmailAndState(postUserReq.getEmail(), ACTIVE);
-        if(checkUser.isPresent() == true){
+        if (checkUser.isPresent()) {
             throw new BaseException(POST_USERS_EXISTS_EMAIL);
         }
 
         String encryptPwd;
         try {
-            encryptPwd = new SHA256().encrypt(postUserReq.getPassword());
+            encryptPwd = SHA256.encrypt(postUserReq.getPassword());
             postUserReq.setPassword(encryptPwd);
         } catch (Exception exception) {
             throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
@@ -98,30 +96,37 @@ public class UserService {
     @Transactional(readOnly = true)
     public boolean checkUserByEmail(String email) {
         Optional<User> result = userRepository.findByEmailAndState(email, ACTIVE);
-        if (result.isPresent()) return true;
-        return false;
+        return result.isPresent();
     }
 
     public PostLoginRes logIn(PostLoginReq postLoginReq) {
         User user = userRepository.findByEmailAndState(postLoginReq.getEmail(), ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_FIND_USER));
-
         String encryptPwd;
         try {
-            encryptPwd = new SHA256().encrypt(postLoginReq.getPassword());
+            encryptPwd = SHA256.encrypt(postLoginReq.getPassword());
         } catch (Exception exception) {
             throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
         }
 
-        if(user.getPassword().equals(encryptPwd)){
+        if (user.getPassword().equals(encryptPwd)) {
             Long userId = user.getId();
+            // 유저의 최근 로그인 날짜 업데이트
+            user.updateLastLogin();
             String jwt = jwtService.createJwt(userId);
-            return new PostLoginRes(userId,jwt);
-        } else{
+            return new PostLoginRes(userId, jwt);
+        } else {
             throw new BaseException(FAILED_TO_LOGIN);
         }
 
     }
+
+    @Transactional
+    public void oauthLogin(String email) {
+        User user = userRepository.findByEmailAndState(email, ACTIVE).orElseThrow(() -> new BaseException(NOT_FIND_USER));
+        user.updateLastLogin();
+    }
+
 
     public GetUserRes getUserByEmail(String email) {
         User user = userRepository.findByEmailAndState(email, ACTIVE).orElseThrow(() -> new BaseException(NOT_FIND_USER));
