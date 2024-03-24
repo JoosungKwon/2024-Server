@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Immutable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -22,8 +23,8 @@ public class PostListView {
     private String userName;
     private String userFilePath;
     private String content;
-    private int likeCount;
-    private int commentCount;
-    private String createdAt;
-    private String updatedAt;
+    private Integer likeCount;
+    private Integer commentCount;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
