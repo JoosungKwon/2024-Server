@@ -1,0 +1,36 @@
+version: '3'
+networks:
+  demo-network:
+    driver: bridge
+
+services:
+  demo-db:
+    container_name: demo-db
+    image: mysql:latest
+    restart: always
+    environment:
+      MARIADB_DATABASE: demo
+      MARIADB_USERNAME: root
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mariadbdata:/var/lib/mariadb
+    networks:
+      - demo-network
+
+  demo-app:
+    container_name: demo-app
+    image: joosungkwon/demo:latest
+    depends_on:
+      - demo-db
+    ports:
+      - "80:80"
+    environment:
+      DB_URL: jdbc:mysql://demo-db:3306/demo?autoReconnect=true&setTimezone=Asia/Seoul
+      DB_USER_NAME: root
+      DB_PASSWORD: ${DB_PASSWORD}
+      ACTIVE_PROFILE: local
+    networks:
+      - demo-network
