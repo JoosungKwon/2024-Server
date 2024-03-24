@@ -1,12 +1,10 @@
-package com.example.demo.common.response;
+package com.example.demo.common.model.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import static com.example.demo.common.response.BaseResponseStatus.SUCCESS;
 
 @Getter
 @AllArgsConstructor
@@ -21,9 +19,9 @@ public class BaseResponse<T> {
 
     // 요청에 성공한 경우
     public BaseResponse(T result) {
-        this.isSuccess = SUCCESS.isSuccess();
-        this.message = SUCCESS.getMessage();
-        this.code = SUCCESS.getCode();
+        this.isSuccess = BaseResponseStatus.SUCCESS.isSuccess();
+        this.message = BaseResponseStatus.SUCCESS.getMessage();
+        this.code = BaseResponseStatus.SUCCESS.getCode();
         this.result = result;
     }
 

@@ -1,7 +1,7 @@
 package com.example.demo.common.exceptions;
 
-import com.example.demo.common.response.BaseResponse;
-import com.example.demo.common.response.BaseResponseStatus;
+import com.example.demo.common.model.response.BaseResponse;
+import com.example.demo.common.model.response.BaseResponseStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

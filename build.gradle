@@ -27,22 +27,22 @@ dependencies {
 
 
     // Spring Boot Starter
-    testImplementation ('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
 
     // Lombok
-    implementation ('org.projectlombok:lombok')
-    compileOnly ('org.projectlombok:lombok:1.18.24')
-    annotationProcessor ('org.projectlombok:lombok:1.18.24')
+    implementation('org.projectlombok:lombok')
+    compileOnly('org.projectlombok:lombok:1.18.24')
+    annotationProcessor('org.projectlombok:lombok:1.18.24')
 
     // DB
-    runtimeOnly ('mysql:mysql-connector-java') //mysql8
+    runtimeOnly('mysql:mysql-connector-java') //mysql8
     //runtimeOnly 'mysql:mysql-connector-java:5.1.47' //mysql5
-    implementation ('org.springframework.boot:spring-boot-starter-jdbc')
-    implementation ('org.springframework.boot:spring-boot-starter-data-jpa')
+    implementation('org.springframework.boot:spring-boot-starter-jdbc')
+    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
 
 
     // Web
-    implementation ('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.boot:spring-boot-starter')
     implementation('org.springframework.boot:spring-boot-starter-web')
 
@@ -54,7 +54,19 @@ dependencies {
     implementation('io.jsonwebtoken:jjwt:0.9.1')
 
     // Swagger
-    implementation ('org.springdoc:springdoc-openapi-ui:1.6.14')
+    implementation('org.springdoc:springdoc-openapi-ui:1.6.14')
+
+    // AWS
+    implementation('com.amazonaws:aws-java-sdk-s3:1.12.661')
+
+    // QueryDSL
+    implementation "io.github.openfeign.querydsl:querydsl-jpa:5.2"
+    // QueryDSL - JPAAnnotationProcessor 사용 지정
+    annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:5.2:jpa")
+    // java.lang.NoClassDefFoundError(javax.annotation.Entity) 발생 대응
+    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+    // java.lang.NoClassDefFoundError (javax.annotation.Generated) 발생 대응
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
 
 
 }
